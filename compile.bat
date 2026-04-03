@@ -15,9 +15,10 @@ if errorlevel 1 (
 
 :build
 echo.
-echo === Bahuckel: npm run build ===
+echo === Bahuckel: npm run build:client-exe ===
+echo Builds shared, server, Vite client, Server GUI, then Bahuckel portable exe.
 echo.
-call npm run build
+call npm run build:client-exe
 if errorlevel 1 (
   echo.
   echo Build failed.

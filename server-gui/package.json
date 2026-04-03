@@ -25,20 +25,12 @@
         "to": "bahuckel-server.exe"
       },
       {
-        "from": "../release/bahuckel-website.exe",
-        "to": "bahuckel-website.exe"
-      },
-      {
         "from": "../release/sql-wasm.wasm",
         "to": "sql-wasm.wasm"
       },
       {
         "from": "../release/public",
         "to": "public"
-      },
-      {
-        "from": "../release/public-website",
-        "to": "public-website"
       }
     ],
     "win": {

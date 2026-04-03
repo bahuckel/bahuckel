@@ -16,6 +16,12 @@ const outDir = path.join(root, 'server', 'dist-pkg');
 const releaseDir = path.join(root, 'release');
 const postjectCli = path.join(root, 'node_modules', 'postject', 'dist', 'cli.js');
 
+/** When `website/package.json` is missing (e.g. OSS clone), skip marketing exe + public-website unless BAHUCKEL_BUILD_WEBSITE=1. Set BAHUCKEL_SKIP_WEBSITE=1 to skip even with a local website workspace. */
+const hasMarketingWorkspace = fs.existsSync(path.join(root, 'website', 'package.json'));
+const skipMarketing =
+  process.env.BAHUCKEL_SKIP_WEBSITE === '1' ||
+  (!hasMarketingWorkspace && process.env.BAHUCKEL_BUILD_WEBSITE !== '1');
+
 if (!fs.existsSync(serverSrc)) {
   console.error('Server source not found:', serverSrc);
   process.exit(1);
@@ -134,15 +140,19 @@ buildSeaExe({
   banner: '/* Bahuckel Server - SEA bundle */',
 });
 
-buildSeaExe({
-  entry: 'website-only.ts',
-  entryPoints: [websiteOnlySrc],
-  bundleOut: 'bundle-website.cjs',
-  seaBlob: path.join(outDir, 'sea-website.blob'),
-  seaConfigPath: path.join(outDir, 'sea-config-website.json'),
-  exeName: 'bahuckel-website.exe',
-  banner: '/* Bahuckel marketing site - SEA bundle */',
-});
+if (!skipMarketing) {
+  buildSeaExe({
+    entry: 'website-only.ts',
+    entryPoints: [websiteOnlySrc],
+    bundleOut: 'bundle-website.cjs',
+    seaBlob: path.join(outDir, 'sea-website.blob'),
+    seaConfigPath: path.join(outDir, 'sea-config-website.json'),
+    exeName: 'bahuckel-website.exe',
+    banner: '/* Bahuckel marketing site - SEA bundle */',
+  });
+} else {
+  console.log('Skipping bahuckel-website.exe (no website/ workspace). Set BAHUCKEL_BUILD_WEBSITE=1 to build it.');
+}
 
 // Optional: assign build/icon.ico to bahuckel-website.exe via shortcut Properties or a post-build rcedit step.
 
@@ -159,18 +169,27 @@ if (fs.existsSync(clientDist)) {
 
 const websiteDist = path.join(root, 'website', 'dist');
 const releasePublicWebsite = path.join(releaseDir, 'public-website');
-if (fs.existsSync(path.join(websiteDist, 'index.html'))) {
-  fs.cpSync(websiteDist, releasePublicWebsite, { recursive: true });
-  console.log('Copied marketing site to', releasePublicWebsite);
+if (!skipMarketing) {
+  if (fs.existsSync(path.join(websiteDist, 'index.html'))) {
+    fs.cpSync(websiteDist, releasePublicWebsite, { recursive: true });
+    console.log('Copied marketing site to', releasePublicWebsite);
+  } else {
+    console.warn('website/dist not found. Optional: build the marketing site, then rebuild the server exe.');
+    fs.mkdirSync(releasePublicWebsite, { recursive: true });
+    fs.writeFileSync(
+      path.join(releasePublicWebsite, 'index.html'),
+      '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Bahuckel</title><style>body{font-family:system-ui;background:#1e1f22;color:#b5bac1;padding:2rem;line-height:1.5}</style></head><body><p>Marketing site not built. From the repo root run <strong>npm run build:website</strong>, then rebuild the server GUI.</p><p><a href="http://127.0.0.1:3001/" style="color:#5865f2">Open chat (3001)</a></p></body></html>',
+      'utf8'
+    );
+    console.log('Wrote placeholder', releasePublicWebsite);
+  }
 } else {
-  console.warn('website/dist not found. Optional: npm run build:website (bahuckel.com landing page on port 8080).');
-  fs.mkdirSync(releasePublicWebsite, { recursive: true });
-  fs.writeFileSync(
-    path.join(releasePublicWebsite, 'index.html'),
-    '<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"/><meta name="viewport" content="width=device-width,initial-scale=1"/><title>Bahuckel</title><style>body{font-family:system-ui;background:#1e1f22;color:#b5bac1;padding:2rem;line-height:1.5}</style></head><body><p>Marketing site not built. From the repo root run <strong>npm run build:website</strong>, then rebuild the server GUI.</p><p><a href="http://127.0.0.1:3001/" style="color:#5865f2">Open chat (3001)</a></p></body></html>',
-    'utf8'
-  );
-  console.log('Wrote placeholder', releasePublicWebsite);
+  try {
+    fs.rmSync(releasePublicWebsite, { recursive: true, force: true });
+  } catch {
+    /* ignore */
+  }
+  console.log('Skipping public-website/ (no website/ workspace).');
 }
 
 // Ensure /emoji/* and /emoji/codepoints.json exist so the client can load PNGs and the codepoint list.
@@ -199,7 +218,9 @@ fs.writeFileSync(
   '@echo off\r\n' +
     'cd /d "%~dp0"\r\n' +
     'set WEBSITE_PORT=0\r\n' +
-    'echo Starting Bahuckel chat server (marketing site: use start-website.bat)...\r\n' +
+    (skipMarketing
+      ? 'echo Starting Bahuckel chat server...\r\n'
+      : 'echo Starting Bahuckel chat server (marketing site: use start-website.bat)...\r\n') +
     'start "" bahuckel-server.exe\r\n' +
     'echo Chat app: http://localhost:3001\r\n',
   'utf8'
@@ -207,16 +228,34 @@ fs.writeFileSync(
 console.log('Created', startBatPath);
 
 const startWebsiteBatPath = path.join(releaseDir, 'start-website.bat');
-fs.writeFileSync(
-  startWebsiteBatPath,
-  '@echo off\r\n' +
-    'cd /d "%~dp0"\r\n' +
-    'echo Starting marketing site on port 8080...\r\n' +
-    'start "" bahuckel-website.exe\r\n' +
-    'echo Open http://127.0.0.1:8080\r\n',
-  'utf8'
-);
-console.log('Created', startWebsiteBatPath);
+if (!skipMarketing) {
+  fs.writeFileSync(
+    startWebsiteBatPath,
+    '@echo off\r\n' +
+      'cd /d "%~dp0"\r\n' +
+      'echo Starting marketing site on port 8080...\r\n' +
+      'start "" bahuckel-website.exe\r\n' +
+      'echo Open http://127.0.0.1:8080\r\n',
+    'utf8'
+  );
+  console.log('Created', startWebsiteBatPath);
+} else {
+  try {
+    if (fs.existsSync(startWebsiteBatPath)) fs.unlinkSync(startWebsiteBatPath);
+  } catch {
+    /* ignore */
+  }
+  const staleExe = path.join(releaseDir, 'bahuckel-website.exe');
+  const staleTemp = path.join(releaseDir, 'bahuckel-website-temp.exe');
+  for (const p of [staleExe, staleTemp]) {
+    try {
+      if (fs.existsSync(p)) fs.unlinkSync(p);
+    } catch {
+      /* ignore (e.g. file in use) */
+    }
+  }
+  console.log('Skipping start-website.bat (no website/ workspace).');
+}
 
 // sql.js (SQLite) needs WASM on disk — SEA bundle cannot embed it. Ship next to exe for server GUI / portable release.
 const sqlWasmCandidates = [
@@ -238,5 +277,10 @@ if (sqlWasmSrc) {
   console.warn('sql-wasm.wasm not found (tried hoisted + server node_modules). npm install sql.js.');
 }
 
-console.log('Done. Chat:', path.join(releaseDir, 'bahuckel-server.exe'), '| Marketing:', path.join(releaseDir, 'bahuckel-website.exe'));
-console.log('Run from release/ so bahuckel-server.exe finds public/ and bahuckel-website.exe finds public-website/.');
+if (skipMarketing) {
+  console.log('Done. Chat:', path.join(releaseDir, 'bahuckel-server.exe'));
+  console.log('Run from release/ so bahuckel-server.exe finds public/.');
+} else {
+  console.log('Done. Chat:', path.join(releaseDir, 'bahuckel-server.exe'), '| Marketing:', path.join(releaseDir, 'bahuckel-website.exe'));
+  console.log('Run from release/ so bahuckel-server.exe finds public/ and bahuckel-website.exe finds public-website/.');
+}
