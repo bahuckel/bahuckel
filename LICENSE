@@ -1,0 +1,90 @@
+Bahuckel License
+================
+
+Copyright (c) 2026 Bahuckel contributors
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use,
+copy, modify, merge, publish, and distribute copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the
+conditions below.
+
+1. GRANT (what you may do without asking)
+
+   You may:
+
+   - Download, clone, fork, read, and edit the source code for any purpose.
+   - Build and run the Software for personal, educational, non-profit, or
+     **commercial** purposes, including for your business or organization,
+     when **you** operate the deployment (self-hosted or on infrastructure you
+     control for your own users, such as a single company or community server).
+   - Modify the Software for your own use and share those modifications under
+     the same terms as this license, provided you include this license and
+     copyright notice with substantial copies of the Software.
+   - Use the Software in internal tools, private networks, and single-tenant
+     deployments where you are not primarily selling access to *hosted Bahuckel
+     as a service to unrelated third parties* (see section 2).
+
+2. ADDITIONAL RESTRICTIONS (require prior written permission)
+
+   The following require **prior written permission** from the copyright holder
+   (contact: bahuckel@gmail.com — a dedicated licensing address may be listed
+   later on the project website):
+
+   (a) **Selling the Software** as a standalone product or primary offering—for
+       example: selling prebuilt binaries, installers, or access to the
+       Software itself as the main thing customers pay for—without approval.
+
+   (b) **Hosted service for others** — operating a service where **you** run
+       Bahuckel **for unrelated third parties** as customers or subscribers
+       (multi-tenant “Bahuckel as a service,” managed hosting of Bahuckel for
+       the public or for paying clients as the core product), without approval.
+
+   **Not restricted** by (b): running Bahuckel for yourself; for your employer
+   or organization’s own members; for a single community you administer;
+   giving friends access on a server you run without running it as a commercial
+   hosting business; charging only for unrelated things (e.g. unrelated
+   consulting) where Bahuckel is not the sold service.
+
+   The copyright holder may grant exceptions in writing (including terms for
+   trusted hosts, audits, or transparency requirements).
+
+3. PURPOSE OF SECTION 2
+
+   These restrictions are a **safeguard**: they aim to reduce the risk that
+   third-party operators could use the Software to **collect user data without
+   clear consent**, **modify the Software to enable tracking or surveillance**
+   against end users, or present a **modified or opaque build** in ways that
+   undermine user trust. They are **not** intended to stop legitimate
+   self-hosting, business use on your own stack, or good-faith forks that
+   respect user privacy.
+
+   **Nothing in this license obligates the copyright holder to approve any
+   specific use.** Approval, when given, may include conditions (e.g.
+   transparency, no resale of user data, security review).
+
+4. CONTRIBUTIONS
+
+   If you contribute code or other materials to the project, you agree those
+   contributions are licensed under the same terms unless you state otherwise in
+   writing.
+
+5. DISCLAIMER OF WARRANTY
+
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+   AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+   LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+6. MISCELLANEOUS
+
+   This license applies to the Bahuckel project as a whole unless a file or
+   directory specifies a different license. Third-party components (libraries,
+   fonts, emoji assets, etc.) remain under their respective licenses—see
+   LICENSES.md and package notices.
+
+   This document is not legal advice. For commercial hosting, resale, or other
+   uses in section 2, consult qualified counsel or contact the copyright holder.

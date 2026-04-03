@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bahuckel – Select server</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: #2b2d31;
+      color: #f2f3f5;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    h1 { font-size: 18px; margin: 0 0 4px; font-weight: 600; }
+    .sub { font-size: 12px; color: #b5bac1; margin-bottom: 16px; }
+    .servers-list {
+      flex: 1;
+      min-height: 120px;
+      border: 1px solid #40444b;
+      border-radius: 8px;
+      background: #383a40;
+      padding: 8px;
+      margin-bottom: 16px;
+      overflow-y: auto;
+    }
+    .server-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      border-radius: 6px;
+      margin-bottom: 4px;
+    }
+    .server-row:last-child { margin-bottom: 0; }
+    .server-row:hover { background: #40444b; }
+    .server-row.selected { background: #5865f2; }
+    .server-status-dot {
+      flex-shrink: 0;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #4e5058;
+    }
+    .server-status-dot.up { background: #248046; }
+    .server-status-dot.down { background: #ed4245; }
+    .server-status-dot.checking { background: #b5bac1; opacity: 0.8; }
+    .server-name { flex: 0 0 120px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .server-url { flex: 1; font-size: 12px; color: #b5bac1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .server-actions { display: flex; gap: 6px; }
+    .server-actions button {
+      padding: 4px 10px;
+      font-size: 12px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      background: #4e5058;
+      color: #f2f3f5;
+    }
+    .server-actions button:hover { background: #5c5e66; }
+    .server-actions button.remove { background: #ed4245; color: white; }
+    .server-actions button.remove:hover { background: #c03537; }
+    .add-section {
+      display: grid;
+      grid-template-columns: 1fr 1fr auto;
+      gap: 8px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    .add-section label { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: #b5bac1; }
+    .add-section input {
+      padding: 8px 10px;
+      font-size: 13px;
+      border: 1px solid #40444b;
+      border-radius: 6px;
+      background: #383a40;
+      color: #f2f3f5;
+    }
+    .add-section input:focus { outline: none; border-color: #5865f2; }
+    .add-section button {
+      padding: 8px 16px;
+      font-size: 13px;
+      font-weight: 600;
+      border: none;
+      border-radius: 6px;
+      background: #5865f2;
+      color: white;
+      cursor: pointer;
+    }
+    .add-section button:hover { background: #4752c4; }
+    .connect-wrap { text-align: center; }
+    .connect-wrap button {
+      padding: 10px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      border: none;
+      border-radius: 8px;
+      background: #248046;
+      color: white;
+      cursor: pointer;
+    }
+    .connect-wrap button:hover { background: #1e6b3a; }
+    .connect-wrap button:disabled { background: #4e5058; cursor: not-allowed; }
+    .empty-list { color: #72767d; font-size: 13px; padding: 16px; text-align: center; }
+    .error { font-size: 12px; color: #ed4245; margin-top: 8px; min-height: 18px; }
+  </style>
+</head>
+<body>
+  <h1>Select a server</h1>
+  <p class="sub">Add servers below, then select one and click Connect. You can return here anytime via Settings → Exit to Select a Server.</p>
+  <div class="servers-list" id="list">
+    <div class="empty-list" id="empty">No servers yet. Add one below.</div>
+    <div id="rows"></div>
+  </div>
+  <div class="add-section">
+    <label>
+      <span>Name</span>
+      <input type="text" id="newName" placeholder="My server" autocomplete="off" />
+    </label>
+    <label>
+      <span>Server URL</span>
+      <input type="text" id="newUrl" placeholder="http://localhost:3001 or server-ip:3001" autocomplete="off" />
+    </label>
+    <button type="button" id="addBtn">Add server</button>
+  </div>
+  <div class="connect-wrap">
+    <button type="button" id="connectBtn" disabled>Connect to selected server</button>
+  </div>
+  <div class="error" id="error"></div>
+  <script>
+    const listEl = document.getElementById('list');
+    const emptyEl = document.getElementById('empty');
+    const rowsEl = document.getElementById('rows');
+    const newName = document.getElementById('newName');
+    const newUrl = document.getElementById('newUrl');
+    const addBtn = document.getElementById('addBtn');
+    const connectBtn = document.getElementById('connectBtn');
+    const errEl = document.getElementById('error');
+
+    let selectedId = null;
+    const serverStatus = {}; // id -> 'up' | 'down' | 'checking'
+
+    async function checkHealth(url) {
+      try {
+        const ctrl = new AbortController();
+        const t = setTimeout(() => ctrl.abort(), 5000);
+        const res = await fetch(url.replace(/\/$/, '') + '/health', { method: 'GET', signal: ctrl.signal });
+        clearTimeout(t);
+        return res.ok;
+      } catch {
+        return false;
+      }
+    }
+
+    function updateServerStatus(id, status) {
+      if (serverStatus[id] === status) return;
+      serverStatus[id] = status;
+      const row = rowsEl.querySelector(`.server-row[data-id="${id}"]`);
+      const dot = row?.querySelector('.server-status-dot');
+      if (dot) {
+        dot.className = 'server-status-dot ' + status;
+        dot.title = status === 'up' ? 'Server is up' : status === 'down' ? 'Server is down' : 'Checking…';
+      }
+    }
+
+    function render(config) {
+      const servers = config.servers || [];
+      emptyEl.style.display = servers.length ? 'none' : 'block';
+      rowsEl.innerHTML = '';
+      servers.forEach((s) => {
+        const status = serverStatus[s.id] || 'checking';
+        const row = document.createElement('div');
+        row.className = 'server-row' + (s.id === selectedId ? ' selected' : '');
+        row.dataset.id = s.id;
+        row.innerHTML = `
+          <span class="server-status-dot ${status}" title="${status === 'up' ? 'Server is up' : status === 'down' ? 'Server is down' : 'Checking…'}"></span>
+          <span class="server-name" title="${escapeHtml(s.name)}">${escapeHtml(s.name)}</span>
+          <span class="server-url" title="${escapeHtml(s.url)}">${escapeHtml(s.url)}</span>
+          <div class="server-actions">
+            <button type="button" class="connect-row">Connect</button>
+            <button type="button" class="remove">Remove</button>
+          </div>
+        `;
+        row.querySelector('.connect-row').addEventListener('click', (e) => { e.stopPropagation(); connect(s.url); });
+        row.querySelector('.remove').addEventListener('click', (e) => { e.stopPropagation(); remove(s.id); });
+        row.addEventListener('click', () => select(s.id));
+        rowsEl.appendChild(row);
+        if (status === 'checking') {
+          checkHealth(s.url).then((ok) => updateServerStatus(s.id, ok ? 'up' : 'down'));
+        }
+      });
+      connectBtn.disabled = !selectedId;
+    }
+
+    function refreshAllStatuses() {
+      const config = window._lastConfig;
+      if (!config?.servers?.length) return;
+      config.servers.forEach((s) => {
+        checkHealth(s.url).then((ok) => updateServerStatus(s.id, ok ? 'up' : 'down'));
+      });
+    }
+
+    function escapeHtml(s) {
+      const div = document.createElement('div');
+      div.textContent = s;
+      return div.innerHTML;
+    }
+
+    function select(id) {
+      selectedId = id;
+      rowsEl.querySelectorAll('.server-row').forEach((r) => r.classList.toggle('selected', r.dataset.id === id));
+      connectBtn.disabled = false;
+    }
+
+    function load() {
+      window.bahuckel.getConfig().then((config) => {
+        window._lastConfig = config;
+        if (!selectedId && config.servers && config.servers.length) selectedId = config.servers[0].id;
+        render(config);
+      });
+    }
+
+    function add() {
+      const name = newName.value.trim() || 'Server';
+      const url = newUrl.value.trim();
+      if (!url) { errEl.textContent = 'Enter a server URL.'; return; }
+      errEl.textContent = '';
+      addBtn.disabled = true;
+      window.bahuckel.addServer(name, url).then((config) => {
+        window._lastConfig = config;
+        newName.value = '';
+        newUrl.value = '';
+        if (config.servers.length) selectedId = config.servers[config.servers.length - 1].id;
+        render(config);
+        addBtn.disabled = false;
+      }).catch(() => {
+        errEl.textContent = 'Could not add server.';
+        addBtn.disabled = false;
+      });
+    }
+
+    function remove(id) {
+      window.bahuckel.removeServer(id).then((config) => {
+        window._lastConfig = config;
+        if (selectedId === id) selectedId = config.servers.length ? config.servers[0].id : null;
+        render(config);
+      });
+    }
+
+    function connect(url) {
+      if (!url) return;
+      errEl.textContent = '';
+      connectBtn.disabled = true;
+      window.bahuckel.connectToServer(url).catch(() => {
+        errEl.textContent = 'Could not connect.';
+        connectBtn.disabled = false;
+      });
+    }
+
+    addBtn.addEventListener('click', add);
+    connectBtn.addEventListener('click', () => {
+      const config = (window._lastConfig || { servers: [] });
+      const s = config.servers.find((x) => x.id === selectedId);
+      if (s) connect(s.url);
+    });
+    newUrl.addEventListener('keydown', (e) => { if (e.key === 'Enter') add(); });
+
+    window.bahuckel.getConfig().then((config) => {
+      window._lastConfig = config;
+      if (config.servers && config.servers.length) selectedId = config.servers[0].id;
+      render(config);
+      setInterval(refreshAllStatuses, 1000);
+    });
+  </script>
+</body>
+</html>

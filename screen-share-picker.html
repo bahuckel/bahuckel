@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Share screen</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, sans-serif; background: #2b2d31; color: #f2f3f5; padding: 16px; }
+    h2 { margin: 0 0 12px; font-size: 14px; font-weight: 600; }
+    .tabs { display: flex; gap: 4px; margin-bottom: 12px; }
+    .tabs button { padding: 8px 16px; border: none; background: #383a40; color: #b5bac1; border-radius: 6px; cursor: pointer; font-size: 13px; }
+    .tabs button.active { background: #5865f2; color: #fff; }
+    .tabs button:hover:not(.active) { background: #404249; color: #f2f3f5; }
+    .source-list { display: flex; flex-wrap: wrap; gap: 12px; max-height: 320px; overflow-y: auto; }
+    .source-item { width: 160px; cursor: pointer; border-radius: 8px; overflow: hidden; border: 2px solid transparent; transition: border-color 0.15s; }
+    .source-item:hover { border-color: #5865f2; }
+    .source-item img { width: 100%; height: 90px; object-fit: cover; display: block; }
+    .source-item span { display: block; padding: 8px; font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .source-item.type-window { display: none; }
+    .source-item.type-screen { display: flex; flex-direction: column; }
+    body.show-windows .source-item.type-screen { display: none; }
+    body.show-windows .source-item.type-window { display: flex; flex-direction: column; }
+    .picker-debug-btn { position: fixed; bottom: 8px; right: 8px; padding: 4px 8px; font-size: 11px; background: #383a40; color: #b5bac1; border: 1px solid #5865f2; border-radius: 4px; cursor: pointer; z-index: 999; }
+    .picker-debug-btn:hover { background: #404249; color: #fff; }
+    .picker-debug-panel { position: fixed; bottom: 36px; right: 8px; left: 8px; max-height: 180px; overflow-y: auto; background: rgba(0,0,0,0.9); border: 1px solid #5865f2; border-radius: 8px; padding: 8px; font-size: 11px; font-family: monospace; z-index: 998; display: none; }
+    .picker-debug-panel.visible { display: block; }
+    .picker-debug-panel .log-line { margin: 2px 0; word-break: break-all; }
+    .picker-debug-panel .copy-btn { margin-top: 8px; padding: 4px 8px; cursor: pointer; background: #5865f2; color: #fff; border: none; border-radius: 4px; font-size: 11px; }
+    .picker-focus-overlay { position: fixed; inset: 0; z-index: 500; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <div class="picker-focus-overlay" id="picker-focus-overlay" style="display: none;"></div>
+  <h2>Share screen</h2>
+  <div class="tabs">
+    <button type="button" class="active" data-tab="screens">Screens</button>
+    <button type="button" data-tab="windows">Windows</button>
+  </div>
+  <div class="source-list" id="source-list"></div>
+  <button type="button" class="picker-debug-btn" id="picker-debug-btn">Debug log</button>
+  <div class="picker-debug-panel" id="picker-debug-panel">
+    <div id="picker-debug-entries"></div>
+    <button type="button" class="copy-btn" id="picker-debug-copy">Copy log</button>
+  </div>
+  <script>
+    const list = document.getElementById('source-list');
+    const tabs = document.querySelectorAll('.tabs button');
+    const focusOverlay = document.getElementById('picker-focus-overlay');
+    const debugBtn = document.getElementById('picker-debug-btn');
+    const debugPanel = document.getElementById('picker-debug-panel');
+    const debugEntries = document.getElementById('picker-debug-entries');
+    const copyBtn = document.getElementById('picker-debug-copy');
+
+    const pickerLogEntries = [];
+    const MAX_LOG = 80;
+    function pickerLog(type, msg, detail) {
+      const t = new Date();
+      const time = t.toTimeString().slice(0, 8) + '.' + String(t.getMilliseconds()).padStart(3, '0');
+      const entry = { time, type, msg, detail: detail || {} };
+      pickerLogEntries.push(entry);
+      if (pickerLogEntries.length > MAX_LOG) pickerLogEntries.shift();
+      const line = document.createElement('div');
+      line.className = 'log-line';
+      line.textContent = time + ' [' + type + '] ' + msg + (Object.keys(entry.detail).length ? ' ' + JSON.stringify(entry.detail) : '');
+      debugEntries.appendChild(line);
+      debugEntries.scrollTop = debugEntries.scrollHeight;
+      try { window.bahuckelPicker?.logToMain?.(type, msg, detail); } catch (_) {}
+    }
+
+    debugBtn.addEventListener('click', () => {
+      debugPanel.classList.toggle('visible');
+    });
+    copyBtn.addEventListener('click', () => {
+      const text = pickerLogEntries.map(e => e.time + ' [' + e.type + '] ' + e.msg + (Object.keys(e.detail || {}).length ? ' ' + JSON.stringify(e.detail) : '')).join('\n');
+      navigator.clipboard.writeText(text).then(() => { copyBtn.textContent = 'Copied!'; setTimeout(() => { copyBtn.textContent = 'Copy log'; }, 1500); });
+    });
+
+    window.addEventListener('focus', () => pickerLog('window', 'focus'));
+    window.addEventListener('blur', () => pickerLog('window', 'blur'));
+    document.addEventListener('pointerdown', (e) => pickerLog('input', 'pointerdown', { target: describeTarget(e.target), button: e.button, capture: 'doc' }), true);
+    document.addEventListener('pointerup', (e) => pickerLog('input', 'pointerup', { target: describeTarget(e.target), button: e.button, capture: 'doc' }), true);
+    document.addEventListener('mousedown', (e) => pickerLog('input', 'mousedown', { target: describeTarget(e.target), button: e.button, capture: 'doc' }), true);
+    document.addEventListener('mouseup', (e) => pickerLog('input', 'mouseup', { target: describeTarget(e.target), button: e.button, capture: 'doc' }), true);
+    document.addEventListener('click', (e) => pickerLog('input', 'click', { target: describeTarget(e.target), capture: 'doc' }), true);
+
+    function describeTarget(el) {
+      if (!el || !el.tagName) return '?';
+      const e = el;
+      const tag = (e.tagName || '').toLowerCase();
+      const id = e.id || undefined;
+      const cls = (e.className && typeof e.className === 'string' ? e.className : '').trim().slice(0, 40);
+      const dataId = e.dataset?.id || (e.getAttribute && e.getAttribute('data-id'));
+      return { tag, id, class: cls || undefined, dataId };
+    }
+
+    function findSourceItem(el) {
+      for (let n = el; n; n = n.parentElement) {
+        if (n.classList && n.classList.contains('source-item')) return n;
+      }
+      return null;
+    }
+
+    function selectSourceById(sourceId, name) {
+      pickerLog('picker', 'selectSource CALLED', { sourceId, name });
+      if (window.bahuckelPicker) window.bahuckelPicker.sendSelected(sourceId);
+    }
+
+    function render(sources, type) {
+      pickerLog('render', 'Sources rendered', { type, count: sources.filter(s => s.type === type).length });
+      list.innerHTML = '';
+      const filtered = sources.filter(s => s.type === type);
+      filtered.forEach(s => {
+        const el = document.createElement('div');
+        el.className = `source-item type-${type}`;
+        el.dataset.id = s.id;
+        const img = document.createElement('img');
+        img.src = s.thumbnail;
+        img.alt = s.name;
+        const span = document.createElement('span');
+        span.textContent = s.name;
+        el.appendChild(img);
+        el.appendChild(span);
+        const selectSource = () => selectSourceById(s.id, s.name);
+        const onPointerDown = (e) => {
+          pickerLog('input', 'pointerdown on source', { sourceId: s.id, button: e.button });
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.button === 0) selectSource();
+        };
+        const onMouseUp = (e) => {
+          pickerLog('input', 'mouseup on source', { sourceId: s.id, button: e.button });
+          e.preventDefault();
+          e.stopPropagation();
+          if (e.button === 0) selectSource();
+        };
+        const onClick = (e) => {
+          pickerLog('input', 'click on source', { sourceId: s.id });
+          e.preventDefault();
+          e.stopPropagation();
+          selectSource();
+        };
+        el.addEventListener('pointerdown', onPointerDown, { capture: true });
+        el.addEventListener('mouseup', onMouseUp, { capture: true });
+        el.addEventListener('click', onClick, { capture: true });
+        list.appendChild(el);
+      });
+      focusOverlay.style.display = 'block';
+      pickerLog('picker', 'Focus overlay shown – first click will select under cursor');
+    }
+
+    focusOverlay.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      const x = e.clientX;
+      const y = e.clientY;
+      focusOverlay.style.display = 'none';
+      pickerLog('picker', 'Overlay click – resolving element at', { x, y });
+      requestAnimationFrame(() => {
+        const under = document.elementFromPoint(x, y);
+        const item = findSourceItem(under);
+        if (item && item.dataset.id) {
+          const s = window.sources && window.sources.find(src => src.id === item.dataset.id);
+          pickerLog('picker', 'Overlay: found source under click', { sourceId: item.dataset.id, name: s && s.name });
+          selectSourceById(item.dataset.id, s && s.name);
+        } else {
+          pickerLog('picker', 'Overlay: no source under click', { under: under ? (under.tagName + (under.className ? '.' + under.className : '')) : 'null' });
+        }
+      });
+    }, { capture: true });
+
+    pickerLog('init', 'Picker loaded');
+    window.bahuckelPicker.onSources((sources) => {
+      pickerLog('picker', 'onSources received', { count: sources.length });
+      window.sources = sources;
+      render(sources, 'screen');
+    });
+
+    tabs.forEach(btn => {
+      btn.addEventListener('click', () => {
+        tabs.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.body.classList.toggle('show-windows', btn.dataset.tab === 'windows');
+        if (window.sources) render(window.sources, btn.dataset.tab === 'windows' ? 'window' : 'screen');
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+node_modules/
+dist/
+
+# Packaged / local build outputs (electron-builder, server exe, etc.)
+release/
+
+# Marketing site (maintained separately; not part of the public OSS tree)
+website/
+server/certs/
+server/data/
+*.pem
+.env
+.env.local
+
+# Local snapshot for GitHub upload (regenerate with: node scripts/export-github-source.mjs)
+github/source/
+
+# Local WebRTC diagnostics dumps (do not commit)
+bahuckel-webrtc-diagnostics-*.json
+# Server-side Giphy key (operators create locally; never commit)
+server/giphy-api-key.txt
+server/giphy-api-key

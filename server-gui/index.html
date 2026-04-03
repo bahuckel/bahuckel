@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Bahuckel Server</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: 'Consolas', 'Monaco', monospace;
+      font-size: 13px;
+      background: #1e1f22;
+      color: #b5bac1;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+    .tabs {
+      display: flex;
+      background: #2b2d31;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
+    }
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+    }
+    .tab:hover { background: #3f4147; color: #f2f3f5; }
+    .tab.active { border-bottom-color: #5865f2; color: #f2f3f5; }
+    .toolbar {
+      display: flex;
+      gap: 8px;
+      padding: 10px 16px;
+      background: #2b2d31;
+      border-bottom: 1px solid rgba(255,255,255,.06);
+      flex-shrink: 0;
+    }
+    .toolbar button {
+      padding: 6px 14px;
+      border-radius: 4px;
+      border: 1px solid rgba(255,255,255,.06);
+      background: #3f4147;
+      color: #f2f3f5;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .toolbar button:hover { background: #4f5157; }
+    .toolbar button.primary { background: #5865f2; border-color: #5865f2; }
+    .toolbar button.primary:hover { background: #4752c4; }
+    .toolbar button.danger:hover { background: #da373c; }
+    .panel {
+      flex: 1;
+      padding: 12px;
+      overflow: auto;
+      background: #1e1f22;
+      white-space: pre-wrap;
+      word-break: break-all;
+    }
+    .panel.hidden { display: none; }
+    .cloudflared-section {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #2b2d31;
+      border-radius: 8px;
+    }
+    .cloudflared-section h3 { margin: 0 0 8px 0; font-size: 14px; color: #f2f3f5; }
+    .cloudflared-section p {
+      margin: 0 0 12px 0;
+      font-size: 12px;
+      color: #b5bac1;
+      line-height: 1.4;
+    }
+    .cloudflared-section .btn-row { display: flex; gap: 8px; margin-top: 8px; }
+    .cloudflared-section .btn-row button {
+      padding: 6px 14px;
+      border-radius: 4px;
+      border: none;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 500;
+    }
+    .cloudflared-section .btn-row button.cf-start {
+      background: #5865f2;
+      color: #fff;
+    }
+    .cloudflared-section .btn-row button.cf-start:hover { background: #4752c4; }
+    .cloudflared-section .btn-row button.cf-stop {
+      background: #da373c;
+      color: #fff;
+    }
+    .cloudflared-section .btn-row button.cf-stop:hover { background: #b61c22; }
+    .cloudflared-tunnel-url {
+      margin: 12px 0;
+      padding: 12px;
+      background: #1e3a1e;
+      border: 1px solid #2d6a2d;
+      border-radius: 6px;
+      font-size: 14px;
+      color: #57f287;
+      word-break: break-all;
+    }
+    .cloudflared-tunnel-url strong { color: #fff; }
+    .owner-section {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #2b2d31;
+      border-radius: 8px;
+    }
+    .owner-section h3 { margin: 0 0 8px 0; font-size: 14px; color: #f2f3f5; }
+    .owner-section p { margin: 0 0 10px 0; font-size: 12px; color: #b5bac1; line-height: 1.4; }
+    .owner-section label { display: block; margin-bottom: 4px; font-size: 12px; color: #b5bac1; }
+    .owner-section input {
+      width: 100%;
+      max-width: 280px;
+      padding: 6px 10px;
+      margin-bottom: 10px;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 4px;
+      background: #1e1f22;
+      color: #f2f3f5;
+      font-size: 13px;
+    }
+    .owner-section .btn-login {
+      margin-top: 4px;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      background: #248046;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+    .owner-section .btn-login:hover { background: #2ea043; }
+    .owner-section .btn-login:disabled { opacity: 0.5; cursor: not-allowed; }
+    .quick-links {
+      margin-bottom: 16px;
+      padding: 12px;
+      background: #2b2d31;
+      border-radius: 8px;
+      border: 1px solid rgba(255,255,255,.06);
+    }
+    .quick-links h3 { margin: 0 0 10px 0; font-size: 14px; color: #f2f3f5; }
+    .quick-links p { margin: 0 0 12px 0; font-size: 12px; color: #b5bac1; line-height: 1.4; }
+    .quick-links .btn-row { display: flex; flex-wrap: wrap; gap: 8px; }
+    .quick-links button {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 14px;
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,.1);
+      background: #3f4147;
+      color: #f2f3f5;
+      cursor: pointer;
+      font-size: 13px;
+    }
+    .quick-links button:hover { background: #4f5157; }
+    .quick-links button .icon-globe { width: 16px; height: 16px; flex-shrink: 0; }
+  </style>
+</head>
+<body>
+  <div class="tabs">
+    <div class="tab active" data-tab="server">Server</div>
+    <div class="tab" data-tab="cloudflared">Cloudflared</div>
+  </div>
+  <div class="toolbar" style="display:none">
+    <button class="primary" id="restart">Restart</button>
+    <button class="danger" id="shutdown">Shutdown</button>
+  </div>
+  <div id="server-panel" class="panel">
+    <div class="owner-section">
+      <h3>Owner account &amp; Giphy</h3>
+      <p>Creates the first admin user to manage the server and view password reset requests. A Giphy API key is required for the in-app GIF picker (free tier at developers.giphy.com).</p>
+      <label for="owner-username">Username</label>
+      <input type="text" id="owner-username" placeholder="admin" autocomplete="username">
+      <label for="owner-password">Password</label>
+      <input type="password" id="owner-password" placeholder="min 8 chars, letter + number" autocomplete="current-password">
+      <label for="giphy-api-key">Giphy API key</label>
+      <input type="password" id="giphy-api-key" placeholder="Paste your Giphy API key" autocomplete="off">
+      <button type="button" class="btn-login" id="login-and-start">Login and Start</button>
+    </div>
+    <div class="quick-links">
+      <h3>Open in browser</h3>
+      <p>Run <strong>bahuckel-website.exe</strong> (or <code>start-website.bat</code> in the release folder) for the marketing site on <strong>8080</strong>. The chat app is on <strong>3001</strong> when the server is running — separate processes so you can restart chat without stopping the site.</p>
+      <div class="btn-row">
+        <button type="button" id="open-public-site" title="http://127.0.0.1:8080">
+          <svg class="icon-globe" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><path d="M2 12h20M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          Marketing site :8080
+        </button>
+        <button type="button" id="open-chat-app" title="http://127.0.0.1:3001">
+          Chat app :3001
+        </button>
+      </div>
+    </div>
+    <div id="server-log"></div>
+  </div>
+  <div id="cloudflared-panel" class="panel hidden">
+    <div class="cloudflared-section">
+      <h3>Cloudflare Tunnel</h3>
+      <p>Exposes your local server to the internet via a temporary URL. Others can join without port forwarding. Requires Cloudflared installed (cloudflare.com/docs).</p>
+      <div id="cloudflared-tunnel-url" class="cloudflared-tunnel-url" style="display:none"></div>
+      <div class="btn-row">
+        <button class="cf-start" id="cf-start">Start</button>
+        <button class="cf-stop" id="cf-stop">Stop</button>
+      </div>
+    </div>
+    <div id="cloudflared-log"></div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron');
+    const serverPanel = document.getElementById('server-panel');
+    const serverLog = document.getElementById('server-log');
+    const cloudflaredPanel = document.getElementById('cloudflared-panel');
+    const cloudflaredLog = document.getElementById('cloudflared-log');
+    const toolbar = document.querySelector('.toolbar');
+    const loginBtn = document.getElementById('login-and-start');
+
+    let serverRunning = false;
+    function setServerUIState(running) {
+      serverRunning = running;
+      loginBtn.style.display = running ? 'none' : 'block';
+      const onServerTab = document.querySelector('.tab.active').dataset.tab === 'server';
+      toolbar.style.display = running && onServerTab ? 'flex' : 'none';
+    }
+
+    (async () => {
+      try {
+        const cfg = await ipcRenderer.invoke('get-owner-config');
+        document.getElementById('owner-username').value = cfg.ownerUsername || '';
+        document.getElementById('owner-password').value = cfg.ownerPassword || '';
+        document.getElementById('giphy-api-key').value = cfg.giphyApiKey || '';
+        const state = await ipcRenderer.invoke('get-startup-state');
+        setServerUIState(!state.ownerRequired);
+      } catch (_) {}
+    })();
+
+    ipcRenderer.on('server-started', () => setServerUIState(true));
+    ipcRenderer.on('server-stopped', () => setServerUIState(false));
+
+    document.querySelectorAll('.tab').forEach(t => {
+      t.addEventListener('click', () => {
+        document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+        t.classList.add('active');
+        serverPanel.classList.toggle('hidden', t.dataset.tab !== 'server');
+        cloudflaredPanel.classList.toggle('hidden', t.dataset.tab !== 'cloudflared');
+        toolbar.style.display = serverRunning && t.dataset.tab === 'server' ? 'flex' : 'none';
+      });
+    });
+
+    loginBtn.addEventListener('click', () => {
+      const user = document.getElementById('owner-username').value.trim();
+      const pass = document.getElementById('owner-password').value;
+      const giphy = document.getElementById('giphy-api-key').value.trim();
+      if (!user || !pass || !giphy) return;
+      loginBtn.disabled = true;
+      ipcRenderer.send('server-login-and-start', { ownerUsername: user, ownerPassword: pass, giphyApiKey: giphy });
+      loginBtn.disabled = false;
+    });
+
+    document.getElementById('restart').addEventListener('click', () => {
+      ipcRenderer.send('server-restart', {
+        ownerUsername: document.getElementById('owner-username').value.trim(),
+        ownerPassword: document.getElementById('owner-password').value,
+        giphyApiKey: document.getElementById('giphy-api-key').value.trim(),
+      });
+    });
+    document.getElementById('shutdown').addEventListener('click', () => ipcRenderer.send('server-shutdown'));
+    document.getElementById('cf-start').addEventListener('click', () => ipcRenderer.send('cloudflared-start'));
+    document.getElementById('cf-stop').addEventListener('click', () => ipcRenderer.send('cloudflared-stop'));
+
+    document.getElementById('open-public-site').addEventListener('click', () => ipcRenderer.invoke('open-public-site'));
+    document.getElementById('open-chat-app').addEventListener('click', () => ipcRenderer.invoke('open-chat-app'));
+
+    ipcRenderer.on('log', (_, type, text) => {
+      const el = type === 'server' ? serverLog : cloudflaredLog;
+      el.textContent += text;
+      el.scrollTop = el.scrollHeight;
+    });
+
+    ipcRenderer.on('cloudflared-tunnel-url', (_, url) => {
+      const el = document.getElementById('cloudflared-tunnel-url');
+      if (!url) {
+        el.textContent = '';
+        el.style.display = 'none';
+        return;
+      }
+      el.textContent = '';
+      el.appendChild(document.createTextNode('Your cloudflared tunnel URL is: '));
+      const a = document.createElement('a');
+      a.href = url;
+      a.textContent = url;
+      a.target = '_blank';
+      a.rel = 'noopener';
+      a.style.color = '#57f287';
+      el.appendChild(a);
+      el.style.display = 'block';
+    });
+  </script>
+</body>
+</html>

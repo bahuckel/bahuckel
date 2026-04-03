@@ -1,0 +1,394 @@
+/* Neon lighting — data-neon="on" on <html>. Outline controls: always a little glow; filled: stronger glow. */
+
+[data-neon="on"] {
+  --neon-full-glow: 0 0 16px var(--neon-glow-soft), 0 0 32px var(--neon-glow-faint), 0 0 48px rgba(0, 0, 0, 0.25);
+  --neon-full-glow-hover: 0 0 22px var(--neon-glow), 0 0 44px var(--neon-glow-soft);
+  /* Outline / ghost buttons: visible at rest (not zero), stronger on hover */
+  --neon-outline-glow: 0 0 8px var(--neon-glow-faint), 0 0 16px var(--neon-glow-soft), 0 0 1px var(--neon-glow-soft);
+  --neon-outline-glow-hover: 0 0 14px var(--neon-glow-soft), 0 0 28px var(--neon-glow-faint);
+  --neon-msg-own-glow: 0 0 14px var(--neon-glow-soft), 0 0 28px var(--neon-glow-faint);
+  --neon-msg-other-glow: 0 0 10px var(--neon-glow-soft), 0 0 22px var(--neon-glow-faint);
+}
+
+/* ---------- Filled / primary buttons ---------- */
+[data-neon="on"] .chat-send-btn:not(:disabled),
+[data-neon="on"] .channel-list-request-join,
+[data-neon="on"] .voice-join-btn,
+[data-neon="on"] .voice-join-prompt .voice-join-btn,
+[data-neon="on"] .friends-add-form .channel-add-submit-inline,
+[data-neon="on"] .channel-add-buttons button[type="submit"],
+[data-neon="on"] .username-modal-submit,
+[data-neon="on"] .settings-modal-submit,
+[data-neon="on"] .modal-invite-row button[type="button"],
+[data-neon="on"] .modal-invite button:last-of-type,
+[data-neon="on"] .settings-avatar-btn-primary,
+[data-neon="on"] .settings-sound-ok-btn,
+[data-neon="on"] .server-icon-editor-btn-primary,
+[data-neon="on"] .roles-modal-add-btn,
+[data-neon="on"] .roles-modal-form-actions button[type="submit"],
+[data-neon="on"] .roles-modal-actions button[type="submit"],
+[data-neon="on"] .join-requests-actions button,
+[data-neon="on"] .friends-request-actions button:first-child,
+[data-neon="on"] .users-toggle-btn.active,
+[data-neon="on"] .chat-header-btn.active,
+[data-neon="on"] .settings-panel-tabs button.active,
+[data-neon="on"] .screenshare-tab.active,
+[data-neon="on"] .voice-screen-share-toolbar-user.active,
+[data-neon="on"] .voice-screen-share-mode-btns button.active,
+[data-neon="on"] .user-ctrl-mode-btn.active,
+[data-neon="on"] .user-ctrl-btn.active,
+[data-neon="on"] .server-create-submit,
+[data-neon="on"] .admin-btn-accept,
+[data-neon="on"] .voice-bar-leave,
+[data-neon="on"] .channel-add-type-btn-active {
+  border-radius: var(--radius-sm);
+  box-shadow: var(--neon-full-glow);
+  transition: box-shadow 0.15s ease, filter 0.15s ease, background 0.15s ease;
+}
+
+[data-neon="on"] .chat-send-btn:hover:not(:disabled),
+[data-neon="on"] .channel-list-request-join:hover,
+[data-neon="on"] .voice-join-btn:hover,
+[data-neon="on"] .friends-add-form .channel-add-submit-inline:hover,
+[data-neon="on"] .channel-add-buttons button[type="submit"]:hover,
+[data-neon="on"] .channel-add-type-btn-active:hover,
+[data-neon="on"] .username-modal-submit:hover,
+[data-neon="on"] .settings-modal-submit:hover,
+[data-neon="on"] .settings-avatar-btn-primary:hover,
+[data-neon="on"] .settings-sound-ok-btn:hover,
+[data-neon="on"] .server-icon-editor-btn-primary:hover {
+  box-shadow: var(--neon-full-glow-hover);
+  filter: brightness(1.06);
+}
+
+/* ---------- Outline / ghost buttons (always some emission; less than filled) ---------- */
+[data-neon="on"] .channel-header-btn,
+[data-neon="on"] .chat-attach-btn,
+[data-neon="on"] .chat-header-btn:not(.active),
+[data-neon="on"] .user-ctrl-btn:not(.muted):not(.deafened):not(.active):not(.user-ctrl-leave-call),
+[data-neon="on"] .user-ctrl-arrow,
+[data-neon="on"] .user-ctrl-mode-btn:not(.active),
+[data-neon="on"] .server-icon-editor-btn:not(.server-icon-editor-btn-primary),
+[data-neon="on"] .settings-avatar-btn:not(.settings-avatar-btn-primary),
+[data-neon="on"] .settings-panel-close,
+[data-neon="on"] .settings-panel-tabs button:not(.active),
+[data-neon="on"] .emoji-picker-btn,
+[data-neon="on"] .emoji-picker-cat-btn,
+[data-neon="on"] .channel-item-menu,
+[data-neon="on"] .login-register-btn,
+[data-neon="on"] .task-recorder-toggle,
+[data-neon="on"] .channel-add-buttons button:not([type="submit"]),
+[data-neon="on"] .channel-add-type-btn:not(.channel-add-type-btn-active),
+[data-neon="on"] .channel-context-menu button,
+[data-neon="on"] .voice-member-popup-inner button,
+[data-neon="on"] .users-context-menu-submenu button,
+[data-neon="on"] .modal-invite-buttons button,
+[data-neon="on"] .roles-modal-form-actions button[type="button"],
+[data-neon="on"] .roles-modal-actions button[type="button"],
+[data-neon="on"] .friends-request-actions button:not(:first-child),
+[data-neon="on"] .server-menu-portal.server-context-menu button,
+[data-neon="on"] .task-recorder-header button,
+[data-neon="on"] .voice-screen-share-toolbar-user:not(.active),
+[data-neon="on"] .voice-screen-share-toolbar-stop,
+[data-neon="on"] .voice-screen-share-toolbar-fullscreen,
+[data-neon="on"] .voice-screen-share-maximize,
+[data-neon="on"] .screenshare-tab:not(.active),
+[data-neon="on"] .voice-screen-share-mode-btns button:not(.active),
+[data-neon="on"] .chat-message-menu-btn,
+[data-neon="on"] .users-panel-close,
+[data-neon="on"] .roles-modal-close,
+[data-neon="on"] .server-icon-editor-close {
+  border-radius: var(--radius-sm) !important;
+  background: transparent !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 48%, transparent) !important;
+  color: var(--text-primary) !important;
+  box-shadow: var(--neon-outline-glow) !important;
+  transition: box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
+}
+
+[data-neon="on"] .user-ctrl-btn.user-ctrl-leave-call {
+  color: #ed4245 !important;
+  border: 1px solid color-mix(in srgb, #ed4245 50%, transparent) !important;
+  background: transparent !important;
+  box-shadow: 0 0 8px rgba(237, 66, 69, 0.28), 0 0 18px rgba(237, 66, 69, 0.12) !important;
+}
+[data-neon="on"] .user-ctrl-btn.user-ctrl-leave-call:hover {
+  background: color-mix(in srgb, #ed4245 14%, var(--bg-tertiary)) !important;
+  border-color: color-mix(in srgb, #ed4245 62%, transparent) !important;
+  box-shadow: var(--neon-outline-glow-hover) !important;
+}
+[data-neon="on"] .user-ctrl-btn.user-ctrl-leave-call .ui-icon {
+  color: #ed4245 !important;
+  opacity: 1;
+}
+
+/* Outline block above forces color: text-primary — keep control SVGs gray-ish */
+[data-neon="on"] .user-ctrl-btn:not(.muted):not(.deafened):not(.active):not(.user-ctrl-leave-call) .ui-icon,
+[data-neon="on"] .user-ctrl-arrow .ui-icon {
+  color: var(--text-secondary) !important;
+  opacity: 0.92;
+}
+[data-neon="on"] .user-ctrl-btn:not(.muted):not(.deafened):not(.active):not(.user-ctrl-leave-call):hover .ui-icon,
+[data-neon="on"] .user-ctrl-arrow:hover .ui-icon {
+  color: color-mix(in srgb, var(--text-primary) 52%, var(--text-secondary) 48%) !important;
+  opacity: 0.96;
+}
+[data-neon="on"] .user-ctrl-btn.muted .ui-icon,
+[data-neon="on"] .user-ctrl-btn.deafened .ui-icon {
+  color: #f23f43 !important;
+  opacity: 1;
+}
+[data-neon="on"] .user-ctrl-btn.active .ui-icon {
+  color: var(--accent) !important;
+  opacity: 1;
+}
+
+[data-neon="on"] .chat-header-btn:not(.active) {
+  color: var(--text-secondary) !important;
+}
+[data-neon="on"] .chat-header-btn:not(.active):hover {
+  color: color-mix(in srgb, var(--text-primary) 52%, var(--text-secondary) 48%) !important;
+}
+
+[data-neon="on"] .settings-logout-btn,
+[data-neon="on"] .settings-exit-server-btn {
+  border-radius: var(--radius-sm) !important;
+  background: transparent !important;
+  border: 1px solid color-mix(in srgb, #f23f43 50%, transparent) !important;
+  color: var(--text-primary) !important;
+  box-shadow: 0 0 8px rgba(242, 63, 67, 0.35), 0 0 18px rgba(242, 63, 67, 0.18) !important;
+  transition: box-shadow 0.15s ease, background 0.15s ease, border-color 0.15s ease, filter 0.15s ease;
+}
+
+[data-neon="on"] .channel-header-btn:hover,
+[data-neon="on"] .channel-add-type-btn:not(.channel-add-type-btn-active):hover,
+[data-neon="on"] .chat-attach-btn:hover,
+[data-neon="on"] .chat-header-btn:not(.active):hover,
+[data-neon="on"] .user-ctrl-btn:not(.muted):not(.deafened):not(.active):not(.user-ctrl-leave-call):hover,
+[data-neon="on"] .user-ctrl-arrow:hover,
+[data-neon="on"] .user-ctrl-mode-btn:not(.active):hover,
+[data-neon="on"] .server-icon-editor-btn:not(.server-icon-editor-btn-primary):hover,
+[data-neon="on"] .settings-avatar-btn:not(.settings-avatar-btn-primary):hover,
+[data-neon="on"] .settings-panel-close:hover,
+[data-neon="on"] .settings-panel-tabs button:not(.active):hover,
+[data-neon="on"] .emoji-picker-btn:hover,
+[data-neon="on"] .emoji-picker-cat-btn:hover,
+[data-neon="on"] .channel-item-menu:hover,
+[data-neon="on"] .login-register-btn:hover,
+[data-neon="on"] .task-recorder-toggle:hover,
+[data-neon="on"] .channel-context-menu button:hover,
+[data-neon="on"] .voice-member-popup-inner button:hover,
+[data-neon="on"] .users-context-menu-submenu button:hover,
+[data-neon="on"] .server-menu-portal.server-context-menu button:hover,
+[data-neon="on"] .task-recorder-header button:hover,
+[data-neon="on"] .chat-message-menu-btn:hover,
+[data-neon="on"] .users-panel-close:hover,
+[data-neon="on"] .roles-modal-close:hover,
+[data-neon="on"] .server-icon-editor-close:hover {
+  box-shadow: var(--neon-outline-glow-hover) !important;
+  background: color-mix(in srgb, var(--neon-color) 10%, var(--bg-tertiary)) !important;
+  border-color: color-mix(in srgb, var(--neon-color) 72%, transparent) !important;
+}
+
+[data-neon="on"] .settings-logout-btn:hover,
+[data-neon="on"] .settings-exit-server-btn:hover {
+  box-shadow: 0 0 14px rgba(242, 63, 67, 0.35), 0 0 24px rgba(242, 63, 67, 0.2) !important;
+  border-color: color-mix(in srgb, #f23f43 55%, transparent) !important;
+}
+
+[data-neon="on"] .chat-header-btn.active,
+[data-neon="on"] .users-toggle-btn.active {
+  border-color: color-mix(in srgb, var(--neon-color) 75%, transparent) !important;
+}
+
+[data-neon="on"] .server-icon:not(:has(img)):hover {
+  box-shadow: var(--neon-full-glow);
+}
+
+[data-neon="on"] .server-icon.active:not(:has(img)) {
+  box-shadow: var(--neon-full-glow-hover);
+}
+
+[data-neon="on"] .chat-reaction {
+  border-radius: 12px;
+  border-color: color-mix(in srgb, var(--neon-color) 35%, transparent) !important;
+  box-shadow: var(--neon-outline-glow);
+}
+
+[data-neon="on"] .chat-reaction:hover {
+  box-shadow: var(--neon-outline-glow-hover);
+}
+
+/* ---------- Default chat (no bubble mode): own = dim neon fill; other = outline + glow ---------- */
+[data-neon="on"] .chat-panel:not(.chat-panel-bubbles) .chat-message-wrapper.chat-message-own .chat-message-group-content {
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin: 2px 0;
+  background: color-mix(in srgb, var(--neon-color) 16%, var(--bg-primary)) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 45%, transparent) !important;
+  box-shadow: var(--neon-msg-own-glow) !important;
+}
+
+[data-neon="on"] .chat-panel:not(.chat-panel-bubbles) .chat-message-wrapper.chat-message-other .chat-message-group-content {
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  margin: 2px 0;
+  background: transparent !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 38%, transparent) !important;
+  box-shadow: var(--neon-msg-other-glow) !important;
+}
+
+[data-neon="on"] .chat-panel:not(.chat-panel-bubbles) .chat-message-wrapper:hover {
+  background: transparent !important;
+}
+
+/* ---------- Bubble chat: group-content is the bubble surface ---------- */
+[data-neon="on"] .chat-message-bubble-bubbles-dark.chat-message-own .chat-message-group-content {
+  background: color-mix(in srgb, var(--neon-color) 28%, var(--bg-tertiary)) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 58%, transparent) !important;
+  box-shadow: var(--neon-msg-own-glow), 0 1px 2px rgba(0, 0, 0, 0.15) !important;
+  border-radius: 18px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+[data-neon="on"] .chat-message-bubble-bubbles-dark.chat-message-other .chat-message-group-content {
+  background: var(--bg-tertiary) !important;
+  color: var(--text-primary) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 42%, transparent) !important;
+  box-shadow: var(--neon-msg-other-glow), 0 1px 2px rgba(0, 0, 0, 0.12) !important;
+  border-radius: 18px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+[data-neon="on"] .chat-message-bubble-bubbles-light.chat-message-own .chat-message-group-content {
+  background: color-mix(in srgb, var(--neon-color) 22%, white) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 48%, transparent) !important;
+  box-shadow: var(--neon-msg-own-glow) !important;
+  border-radius: 18px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+[data-neon="on"] .chat-message-bubble-bubbles-light.chat-message-other .chat-message-group-content {
+  background: color-mix(in srgb, var(--bg-primary) 65%, white) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 32%, transparent) !important;
+  box-shadow: var(--neon-msg-other-glow) !important;
+  border-radius: 18px !important;
+  border-bottom-left-radius: 4px !important;
+}
+
+/* Remove duplicate rules targeting .chat-message only (inner text uses transparent bg in bubble groups) */
+[data-neon="on"] .chat-message-bubble-bubbles-dark.chat-message-own .chat-message,
+[data-neon="on"] .chat-message-bubble-bubbles-dark.chat-message-other .chat-message {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+[data-neon="on"] .chat-empty-icon {
+  color: var(--neon-color);
+  opacity: 0.45;
+  filter: drop-shadow(0 0 10px var(--neon-glow-faint));
+}
+
+[data-neon="on"] .chat-empty-logo {
+  color: var(--neon-color);
+  text-shadow:
+    0 0 12px var(--neon-glow-soft),
+    0 0 28px var(--neon-glow-faint),
+    0 0 40px color-mix(in srgb, var(--neon-color) 35%, transparent);
+  filter: drop-shadow(0 0 14px var(--neon-glow-soft)) drop-shadow(0 0 26px var(--neon-glow-faint));
+}
+
+[data-neon="on"] .server-list-main-sub-divider {
+  background: linear-gradient(90deg, transparent, var(--neon-glow-soft), transparent);
+  box-shadow: 0 0 8px var(--neon-glow-faint);
+}
+
+/* Voice: speaking ring uses chosen neon color + emission */
+[data-neon="on"] .voice-connected-member-avatar.speaking,
+[data-neon="on"] .channel-voice-member-avatar.speaking {
+  box-shadow:
+    0 0 0 2px var(--neon-color),
+    0 0 14px var(--neon-glow-soft),
+    0 0 28px var(--neon-glow-faint),
+    0 0 40px color-mix(in srgb, var(--neon-color) 40%, transparent);
+  transition: box-shadow 0.12s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-neon="on"] .chat-send-btn,
+  [data-neon="on"] .channel-list-request-join,
+  [data-neon="on"] .voice-join-btn {
+    transition: none;
+  }
+}
+
+/* User controls panel: neon outline + glowing divider between identity and actions */
+[data-neon="on"] .user-controls-bar-wrap {
+  border: 1px solid color-mix(in srgb, var(--neon-color) 42%, transparent);
+  box-shadow: var(--neon-outline-glow);
+}
+
+[data-neon="on"] .user-controls-bar-divider {
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    color-mix(in srgb, var(--neon-color) 58%, transparent) 18%,
+    color-mix(in srgb, var(--neon-color) 58%, transparent) 82%,
+    transparent 100%
+  );
+  box-shadow:
+    0 0 10px var(--neon-glow-soft),
+    0 0 22px var(--neon-glow-faint),
+    0 0 1px color-mix(in srgb, var(--neon-color) 45%, transparent);
+}
+
+/* Custom chat wallpaper: translucent toolbar (overrides outline-ghost block above) */
+[data-neon="on"] .chat-panel-custom-bg .chat-header-btn:not(.active),
+[data-neon="on"] .chat-panel-custom-bg .chat-attach-btn {
+  background: color-mix(in srgb, var(--neon-color) 12%, transparent) !important;
+  border: 1px solid color-mix(in srgb, var(--neon-color) 48%, transparent) !important;
+  box-shadow: var(--neon-outline-glow) !important;
+}
+[data-neon="on"] .chat-panel-custom-bg .chat-header-btn:not(.active):hover {
+  background: var(--bg-secondary) !important;
+  border-color: color-mix(in srgb, var(--neon-color) 72%, transparent) !important;
+  box-shadow: var(--neon-outline-glow-hover) !important;
+  color: var(--text-primary) !important;
+}
+[data-neon="on"] .chat-panel-custom-bg .chat-attach-btn:hover {
+  background: var(--bg-tertiary) !important;
+  border-color: color-mix(in srgb, var(--neon-color) 72%, transparent) !important;
+  box-shadow: var(--neon-outline-glow-hover) !important;
+}
+
+/* Custom wallpaper + neon: message tint (30% own / 5% other) */
+[data-neon="on"] .chat-panel-custom-bg:not(.chat-panel-bubbles) .chat-message-wrapper.chat-message-own .chat-message-group-content {
+  background: color-mix(in srgb, var(--neon-color) 30%, transparent) !important;
+}
+[data-neon="on"] .chat-panel-custom-bg:not(.chat-panel-bubbles) .chat-message-wrapper.chat-message-other .chat-message-group-content {
+  background: color-mix(in srgb, var(--neon-color) 5%, transparent) !important;
+}
+
+[data-neon="on"] .chat-panel-custom-bg.chat-panel-bubbles-bubbles-dark .chat-message-wrapper.chat-message-own .chat-message-group-content {
+  background: color-mix(in srgb, var(--bg-tertiary) 30%, transparent) !important;
+}
+[data-neon="on"] .chat-panel-custom-bg.chat-panel-bubbles-bubbles-dark .chat-message-wrapper.chat-message-other .chat-message-group-content {
+  background: color-mix(in srgb, var(--bg-tertiary) 5%, transparent) !important;
+}
+
+[data-neon="on"] .chat-panel-custom-bg.chat-panel-bubbles-bubbles-light .chat-message-wrapper.chat-message-own .chat-message-group-content {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--bg-primary) 65%, white) 30%,
+    transparent
+  ) !important;
+}
+[data-neon="on"] .chat-panel-custom-bg.chat-panel-bubbles-bubbles-light .chat-message-wrapper.chat-message-other .chat-message-group-content {
+  background: color-mix(
+    in srgb,
+    color-mix(in srgb, var(--bg-primary) 65%, white) 5%,
+    transparent
+  ) !important;
+}

@@ -1,0 +1,56 @@
+{
+  "name": "bahuckel-server-gui",
+  "version": "0.1.0",
+  "main": "main.cjs",
+  "devDependencies": {
+    "electron": "^40.6.0",
+    "electron-builder": "^26.8.1"
+  },
+  "private": true,
+  "description": "Bahuckel Server GUI with Cloudflared integration",
+  "build": {
+    "electronVersion": "40.6.0",
+    "appId": "com.bahuckel.server",
+    "productName": "Bahuckel Server",
+    "directories": {
+      "output": "../release/server-gui-build"
+    },
+    "files": [
+      "main.cjs",
+      "index.html"
+    ],
+    "extraResources": [
+      {
+        "from": "../release/bahuckel-server.exe",
+        "to": "bahuckel-server.exe"
+      },
+      {
+        "from": "../release/bahuckel-website.exe",
+        "to": "bahuckel-website.exe"
+      },
+      {
+        "from": "../release/sql-wasm.wasm",
+        "to": "sql-wasm.wasm"
+      },
+      {
+        "from": "../release/public",
+        "to": "public"
+      },
+      {
+        "from": "../release/public-website",
+        "to": "public-website"
+      }
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "dir",
+          "arch": [
+            "x64"
+          ]
+        }
+      ]
+    }
+  }
+}

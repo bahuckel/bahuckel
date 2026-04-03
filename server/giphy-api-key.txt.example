@@ -1,0 +1,6 @@
+# Copy this file to giphy-api-key.txt and put your key on the line below (or any non-comment line).
+# With the Bahuckel Server GUI, you can place the file next to Bahuckel Server.exe OR next to bahuckel-server.exe (in resources/).
+# Get a key at https://developers.giphy.com/
+# Lines starting with # are ignored.
+
+paste_your_giphy_key_here
