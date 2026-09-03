@@ -4,7 +4,7 @@ A 👁️🐝Ⓜ️ engineer with 15 years across hardware and software. I got t
 
 ---
 
-### Self-hosted chat — an open alternative to popular communication apps (like Discord and Slack)
+###Bahuckel Self-hosted chat — an open alternative to popular communication apps (like Discord and Slack)
 
 Text and voice for communities that would rather not hand their conversations to someone else's servers. Built around a simple rule: the server should learn as little as possible.
 
