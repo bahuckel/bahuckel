@@ -4,21 +4,25 @@ A 👁️🐝Ⓜ️ engineer with 15 years across hardware and software. I got t
 
 ---
 
-### BahuckelChat — a self-hosted alternative to Discord and Slack
+### Bahuckel-Hub — a self-hosted alternative to Discord and Slack
 
 Text and voice for communities that would rather not hand their conversations to someone else's servers. Built around a simple rule: the server should learn as little as possible.
 
-- **Nothing is collected.** No analytics, no profiling, no logs sold on. Not even an email address is required to sign up.
-- **End-to-end encrypted** using [Open Quantum Safe](https://openquantumsafe.org/) — post-quantum cryptography, so messages recorded today don't become readable when quantum hardware catches up.
+- **Nothing is collected.** No analytics, no profiling, no logs sold on. Not even an email address is required to sign up — there is no email field anywhere in the server.
+- **End-to-end encrypted** — conversation keys are wrapped between clients and never reach the server in the clear, so it stores ciphertext it cannot read.
+- **Post-quantum key exchange — beta, in testing.** On top of TLS, the client and server agree a session key with a *hybrid* handshake: **ML-KEM-768 alongside classical ECDH**, so it is only weaker than today's crypto if *both* are broken. The point is harvest-now-decrypt-later — traffic captured today should not become readable the day quantum hardware arrives. It needs a platform that provides ML-KEM: **OpenSSL 3.5+ on Linux, or Windows 11 24H2 / Server 2025 and newer**. Anywhere else the connection is plain TLS, exactly as before, and says so rather than pretending. Server owners can *require* it, which locks out clients that cannot do it — off by default, and deliberately awkward to turn on.
 - **Designed so nobody outside your community learns anything about it** — not the members, not the chats, not the calls.
 - **Run it on your own box**, or [get in touch](#contact) if you'd rather I host it for you on a managed VPS.
 
-Currently a ground-up rewrite in **C# / Avalonia**. The original JS/TS Electron build never hit the performance targets I set for it, so it has been retired: [bahuckel-chat-electron-deprecated](https://github.com/bahuckel/bahuckel-chat-electron-deprecated).
+Currently a ground-up rewrite in **C# / .NET 10 / Avalonia**, with around 600 tests behind it. It was called *BahuckelChat* until September 2026. The original JS/TS Electron build never hit the performance targets I set for it, so it has been retired: [bahuckel-chat-electron-deprecated](https://github.com/bahuckel/bahuckel-chat-electron-deprecated).
 
 - **Performance** — the C# rewrite is holding around 0.3% CPU and 160–185 MB of RAM while in a call.
 - **Screen share** — any resolution and frame rate, including custom ones. You are limited only by how fast your GPU can encode frames and by your bandwidth; drop the resolution or the frame rate if you want the overhead lower.
 - **Extras** — KLIPY GIF support (bring your own API key), plus live shared Kanban and whiteboard channel types.
 - **Networking** — works out of the box on an open port. Behind NAT you will need port forwarding, a Cloudflare tunnel, ZeroTier or a similar VPN, unless you would rather pay for a VPS.
+- **Long channels stay light** — a busy channel is not held in memory in one piece. Messages page in and out around you as you read, in both directions, and the client hands memory back on its own while you are idle.
+- **It tells you when a certificate changes.** Self-hosted servers are pinned by fingerprint on first connection. If that fingerprint ever changes, you get the old one, the new one, and a password check before anything is re-trusted — not a login failure with no explanation.
+- **Small comforts** — middle-click free-scroll, jump-to-latest, and a scrollbar you can actually hit.
 
 ### BahuckelDiag — predictive hardware diagnostics
 
