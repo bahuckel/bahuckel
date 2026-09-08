@@ -1,6 +1,6 @@
 ## Hi, I'm Bahuckel
 
-A 👁️🐝Ⓜ️ engineer with 15 years across hardware and software. I got tired of expensive closed-source tools that rarely work properly, so I build the open alternatives myself — self-hosted, no telemetry, no accounts, no strings attached.
+An engineer with 15 years across hardware and software. I got tired of expensive closed-source tools that rarely work properly, so I build the open alternatives myself — self-hosted, no telemetry, no accounts, no strings attached.
 
 ---
 
@@ -10,7 +10,7 @@ Text and voice for communities that would rather not hand their conversations to
 
 - **Nothing is collected.** No analytics, no profiling, no logs sold on. Not even an email address is required to sign up — there is no email field anywhere in the server.
 - **End-to-end encrypted** — conversation keys are wrapped between clients and never reach the server in the clear, so it stores ciphertext it cannot read.
-- **Post-quantum key exchange — beta, in testing.** On top of TLS, the client and server agree a session key with a *hybrid* handshake: **ML-KEM-768 alongside classical ECDH**, so it is only weaker than today's crypto if *both* are broken. The point is harvest-now-decrypt-later — traffic captured today should not become readable the day quantum hardware arrives. It needs a platform that provides ML-KEM: **OpenSSL 3.5+ on Linux, or Windows 11 24H2 / Server 2025 and newer**. Anywhere else the connection is plain TLS, exactly as before, and says so rather than pretending. Server owners can *require* it, which locks out clients that cannot do it — off by default, and deliberately awkward to turn on.
+- **Post-quantum key exchange — beta, in testing.** On top of TLS, the client and server agree a session key with a *hybrid* handshake: **ML-KEM-768 alongside classical ECDH**. ML-KEM is a NIST standard rather than a research curiosity — [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final), published 13 August 2024, built on the Module-LWE problem — and NIST's own claim for it is carefully hedged, so it is quoted here rather than improved on: *“At present, ML-KEM is believed to be secure, even against adversaries who possess a quantum computer.”* Believed, not proven, and that is exactly why this is a hybrid and not a replacement: the session is only weaker than a classical one if *both* halves are broken. What it aims at is harvest-now-decrypt-later — traffic captured today and kept in the hope that quantum hardware will open it later. It needs a platform that provides ML-KEM: **OpenSSL 3.5+ on Linux, or Windows 11 24H2 / Server 2025 and newer**. Anywhere else the connection is plain TLS, exactly as before, and says so rather than pretending. Server owners can *require* it, which locks out clients that cannot do it — off by default, and deliberately awkward to turn on.
 - **Designed so nobody outside your community learns anything about it** — not the members, not the chats, not the calls.
 - **Run it on your own box**, or [get in touch](#contact) if you'd rather I host it for you on a managed VPS.
 
