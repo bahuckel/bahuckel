@@ -4,7 +4,7 @@ An engineer with 15 years across hardware and software. I got tired of expensive
 
 ---
 
-### Bahuckel-Hub — a self-hosted alternative to Discord and Slack
+### Bahuckel-Hub — a self-hosted alternative to closed-source team chat
 
 Text and voice for communities that would rather not hand their conversations to someone else's servers. Built around a simple rule: the server should learn as little as possible.
 
