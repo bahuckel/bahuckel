@@ -2,6 +2,11 @@
 
 An engineer with 15 years across hardware and software. I got tired of expensive closed-source tools that rarely work properly, so I build the open alternatives myself — self-hosted, no telemetry, no accounts, no strings attached.
 
+[![Contact](https://img.shields.io/badge/Contact-bahuckel.com-00d4ff?style=for-the-badge)](https://bahuckel.com/contact)
+[![Beta testers welcome](https://img.shields.io/badge/Beta_testers-welcome-00ff88?style=for-the-badge)](https://bahuckel.com/contact)
+
+**Beta testers welcome.** Hub and Diag are in closed beta with no public download yet. If you want to try one, [open a ticket](https://bahuckel.com/contact) and say which project and which platform, and I will send you a build.
+
 ---
 
 ### Bahuckel-Hub — a self-hosted alternative to closed-source team chat
@@ -12,7 +17,8 @@ Text and voice for communities that would rather not hand their conversations to
 - **End-to-end encrypted** — conversation keys are wrapped between clients and never reach the server in the clear, so it stores ciphertext it cannot read.
 - **Post-quantum key exchange — beta, in testing.** On top of TLS, the client and server agree a session key with a *hybrid* handshake: **ML-KEM-768 alongside classical ECDH**. ML-KEM is a NIST standard rather than a research curiosity — [FIPS 203](https://csrc.nist.gov/pubs/fips/203/final), published 13 August 2024, built on the Module-LWE problem — and NIST's own claim for it is carefully hedged, so it is quoted here rather than improved on: *“At present, ML-KEM is believed to be secure, even against adversaries who possess a quantum computer.”* Believed, not proven, and that is exactly why this is a hybrid and not a replacement: the session is only weaker than a classical one if *both* halves are broken. What it aims at is harvest-now-decrypt-later — traffic captured today and kept in the hope that quantum hardware will open it later. It needs a platform that provides ML-KEM: **OpenSSL 3.5+ on Linux, or Windows 11 24H2 / Server 2025 and newer**. Anywhere else the connection is plain TLS, exactly as before, and says so rather than pretending. Server owners can *require* it, which locks out clients that cannot do it — off by default, and deliberately awkward to turn on.
 - **Designed so nobody outside your community learns anything about it** — not the members, not the chats, not the calls.
-- **Run it on your own box**, or [get in touch](#contact) if you'd rather I host it for you on a managed VPS.
+- **Run it on your own box**, or [get in touch](https://bahuckel.com/contact) if you'd rather I host it for you on a managed VPS.
+- **Want to test it?** There is no public download yet. [Ask for a beta build](https://bahuckel.com/contact) — say which platform, and I will send one.
 
 Currently a ground-up rewrite in **C# / .NET 10 / Avalonia**, with around 600 tests behind it. It was called *BahuckelChat* until September 2026. The original JS/TS Electron build never hit the performance targets I set for it, so it has been retired: [bahuckel-chat-electron-deprecated](https://github.com/bahuckel/bahuckel-chat-electron-deprecated).
 
@@ -45,7 +51,7 @@ It also ships an **AskAI** agent, running on a local model, over your network, o
 - **Web access is off by default.** With it on, the agent still refuses to fetch loopback, private-network, link-local and cloud-metadata addresses.
 - **The local model runs in its own process**, so a model crash can't take the dashboard down with it.
 
-`Python` · `FastAPI` · `SQLite` — in development, private for now.
+`Python` · `FastAPI` · `SQLite` — in development, private for now. Beta testers with real hardware to watch are welcome: [ask for a build](https://bahuckel.com/contact).
 
 ### Elite Dangerous toolkit — EDEXO
 
@@ -64,7 +70,10 @@ Also on here: [slick-tire-converter](https://github.com/bahuckel/slick-tire-conv
 
 ### Contact
 
-Questions, VPS hosting, or just to say hello: **[support@bahuckel.com](mailto:support@bahuckel.com)**
+[![Open a ticket](https://img.shields.io/badge/Open_a_ticket-bahuckel.com%2Fcontact-00d4ff?style=for-the-badge)](https://bahuckel.com/contact)
+[![Beta testers welcome](https://img.shields.io/badge/Beta_testers-welcome-00ff88?style=for-the-badge)](https://bahuckel.com/contact)
+
+Questions, VPS hosting, a beta build, or just to say hello: **[bahuckel.com/contact](https://bahuckel.com/contact)**, or email **[support@bahuckel.com](mailto:support@bahuckel.com)**.
 
 If something here saved you a headache or some time, and you like the idea of software that will never collect, use or sell your data:
 
