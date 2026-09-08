@@ -9,7 +9,7 @@ An engineer with 15 years across hardware and software. I got tired of expensive
 
 ---
 
-### Bahuckel-Hub — a self-hosted alternative to closed-source team chat
+### Bahuckel Hub — a self-hosted alternative to closed-source team chat
 
 Text and voice for communities that would rather not hand their conversations to someone else's servers. Built around a simple rule: the server should learn as little as possible.
 
@@ -36,7 +36,7 @@ Currently a ground-up rewrite in **C# / .NET 10 / Avalonia**, with around 600 te
 - **A small, deliberate sandbox.** A plugin gets channel state it can read and write, a folder of its own, and outbound HTTPS — and that is the entire surface. No process spawn, no arbitrary filesystem, no native calls.
 - **Coming, from me:** graphs and charts as a channel type, and a **BahuckelDiag** integration — so a channel can carry your fleet's health directly: which machine, when, where, and why it flagged something, in the same place your team is already talking.
 
-### BahuckelDiag — predictive hardware diagnostics
+### Bahuckel Diag — predictive hardware diagnostics
 
 Health monitoring for physical Windows and Linux servers that tells you something useful instead of drawing graphs at you.
 
