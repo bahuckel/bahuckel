@@ -25,7 +25,7 @@ Currently a ground-up rewrite in **C# / .NET 10 / Avalonia**, with around 600 te
 - **Performance** — the C# rewrite is holding around 0.3% CPU and 160–185 MB of RAM while in a call.
 - **Screen share** — any resolution and frame rate, including custom ones. You are limited only by how fast your GPU can encode frames and by your bandwidth; drop the resolution or the frame rate if you want the overhead lower.
 - **Extras** — KLIPY GIF support (bring your own API key), plus live shared Kanban and whiteboard channel types.
-- **Networking** — works out of the box on an open port. Behind NAT you will need port forwarding, a Cloudflare tunnel, ZeroTier or a similar VPN, unless you would rather pay for a VPS.
+- **Networking** — works out of the box when TCP 3847 (chat) and UDP 3848–3849 (voice and video) are reachable. Behind NAT, forward those ports, use ZeroTier, Tailscale or a similar VPN, or run it on a VPS. A plain Cloudflare Tunnel is not enough on its own: it carries chat, but not UDP, so voice, camera and screen share will not connect through it. If voice cannot reach the server over UDP, the client tells you so instead of leaving you in a silent call.
 - **Long channels stay light** — a busy channel is not held in memory in one piece. Messages page in and out around you as you read, in both directions, and the client hands memory back on its own while you are idle.
 - **It tells you when a certificate changes.** Self-hosted servers are pinned by fingerprint on first connection. If that fingerprint ever changes, you get the old one, the new one, and a password check before anything is re-trusted — not a login failure with no explanation.
 - **Small comforts** — middle-click free-scroll, jump-to-latest, and a scrollbar you can actually hit.
